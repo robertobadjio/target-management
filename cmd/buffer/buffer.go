@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 )
 
 var b buffer2.Buffer
+var l *log.Logger
 
 func main() {
 	httpConfig, err := config.NewHTTPConfig()
@@ -23,6 +25,8 @@ func main() {
 		log.Fatal("HTTP server config error")
 	}
 	http.HandleFunc("/load-facts", loadFacts) // HTTP-сервер можно вынести в отдельный пакет internal/server
+
+	l = log.New(os.Stdout, "", 0)
 
 	ctx := context.Background()
 
@@ -67,10 +71,15 @@ func loadFacts(w http.ResponseWriter, r *http.Request) {
 		Comment:             r.FormValue("comment"),
 	})
 
-	fmt.Println("Save fact to buffer")
+	Log("Save fact to buffer")
 
 	// В зависимости от ошибок отдавать подходящий код ответа
 	w.WriteHeader(http.StatusOK)
+}
+
+func Log(msg string) {
+	l.SetPrefix(time.Now().Format(time.RFC3339Nano) + " ")
+	l.Println(msg)
 }
 
 func toIntParamRequest(v string) int {
@@ -110,7 +119,7 @@ func saveFacts(ctx context.Context) {
 					fmt.Println(err.Error())
 					// Тут можно поретраить запрос до тех пор, пока не сохранится факт по ручке API
 				} else {
-					fmt.Println("Send fact to API")
+					Log("Send fact to API")
 					// Если сохранили без ошибок в API, извлекаем факт из очереди
 					b.Pop()
 				}
