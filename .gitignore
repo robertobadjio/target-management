@@ -1,0 +1,5 @@
+.idea/
+.env
+c.out
+bin/bombardier
+bin/golangci-lint
