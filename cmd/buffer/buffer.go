@@ -19,6 +19,7 @@ import (
 var b buffer2.Buffer
 var l *log.Logger
 
+// Весь код, который здесь находится, тоже можно вынести в отдельные пакеты, модули, структуры.
 func main() {
 	httpConfig, err := config.NewHTTPConfig()
 	if err != nil {
@@ -116,6 +117,7 @@ func saveFacts(ctx context.Context) {
 
 				// Отправляем факт на сохранение
 				err = factAPIClient.SaveFact(context.Background(), fact)
+				// Здесь нужно сделать обработку ошибок
 				if err != nil {
 					fmt.Println(err.Error())
 					// Тут можно поретраить запрос до тех пор, пока не сохранится факт по ручке API
